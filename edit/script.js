@@ -2,9 +2,7 @@ const API_URL = "https://51.12.220.246:4000";
 
 // Load all images when the button is clicked
 document.getElementById("loadImages").addEventListener("click", loadAllImages);
-document
-  .getElementById("loadImages")
-  .addEventListener("qlearQueue", clearQueue);
+document.getElementById("qlearQueue").addEventListener("click", clearQueue);
 
 async function loadAllImages() {
   const container = document.getElementById("imageList");
