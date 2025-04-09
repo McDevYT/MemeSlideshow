@@ -2,6 +2,7 @@ const API_URL = "https://51.12.220.246:4000";
 
 // Load all images when the button is clicked
 document.getElementById("loadImages").addEventListener("click", loadAllImages);
+document.getElementById("loadImages").addEventListener("click", clearQueue);
 
 async function loadAllImages() {
   const container = document.getElementById("imageList");
@@ -31,6 +32,11 @@ async function loadAllImages() {
       const img = document.createElement("img");
       img.src = imageUrl;
 
+      const sendNextBtn = document.createElement("button");
+      removeBtn.textContent = "Send Next";
+      removeBtn.onclick = async () => {
+        await sendNext(filename);
+      };
       const removeBtn = document.createElement("button");
       removeBtn.textContent = "Remove";
       removeBtn.onclick = async () => {
@@ -62,5 +68,61 @@ async function removeImage(filename) {
     console.log(`Deleted: ${filename}`);
   } catch (err) {
     console.error("Failed to delete image:", err);
+  }
+}
+
+async function sendNext(filename) {
+  try {
+    const res = await fetch(`${API_URL}/SendNext`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ filename }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    console.log(`Next image set: ${filename}`);
+  } catch (err) {
+    console.error("Failed to set next image:", err);
+  }
+}
+
+async function clearQueue() {
+  try {
+    const res = await fetch(`${API_URL}/ClearSendNextQueue`, {
+      method: "POST",
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    console.log(`Queue Cleared`);
+  } catch (err) {
+    console.error("Failed to clear the queue:", err);
+  }
+}
+
+async function GetSendNextQueue() {
+  try {
+    const res = await fetch(`${API_URL}/GetSendNextQueue`, {
+      method: "GET",
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    const queue = await res.json();
+    console.log("Current Send Next Queue:", queue);
+  } catch (err) {
+    console.error("Failed to get the queue:", err);
   }
 }

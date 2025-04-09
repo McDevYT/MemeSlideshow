@@ -29,7 +29,7 @@ async function showNextImage() {
 
 showNextImage();
 
-setInterval(showNextImage, 15000);
+setInterval(showNextImage, 7000);
 
 async function UploadImage(image) {
   const formData = new FormData();
