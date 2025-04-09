@@ -14,8 +14,7 @@ async function loadAllImages() {
       throw new Error(err);
     }
 
-    const data = await res.json();
-    const images = data.images;
+    const images = await res.json();
 
     if (images.length === 0) {
       container.innerHTML = "<p>No images found.</p>";
@@ -23,7 +22,7 @@ async function loadAllImages() {
     }
 
     for (const image of images) {
-      const filename = typeof image === "string" ? image : image.filename; // handle both cases
+      const filename = typeof image === "string" ? image : image.filename;
       const imageUrl = `${API_URL}/images/${filename}`;
 
       const card = document.createElement("div");
