@@ -74,7 +74,7 @@ document.getElementById("img").addEventListener("change", async function () {
   }
 
   const result = await UploadImage(imageFile);
-  document.getElementById("response").textContent = result;
+  alert(result);
 });
 
 const inputElement = document.getElementById("img");
