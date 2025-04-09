@@ -37,8 +37,8 @@ async function loadAllImages() {
       removeBtn.onclick = async () => {
         const confirmed = confirm(`Remove image "${filename}"?`);
         if (confirmed) {
-          await removeImage(filename);
-          loadAllImages(); // Refresh the list
+          await removeImage(filename); // ✅ Pass the actual string
+          loadAllImages(); // Refresh
         }
       };
 
@@ -50,11 +50,3 @@ async function loadAllImages() {
     console.error("Error loading images:", err);
   }
 }
-
-removeBtn.onclick = async () => {
-  const confirmed = confirm(`Remove image "${filename}"?`);
-  if (confirmed) {
-    await removeImage(filename); // ✅ Pass the actual string
-    loadAllImages(); // Refresh
-  }
-};
