@@ -8,7 +8,7 @@ async function loadAllImages() {
   container.innerHTML = ""; // Clear current content
 
   try {
-    const res = await fetch(`${API_URL}/ListImages`);
+    const res = await fetch(`${API_URL}/GetAllImages`);
     if (!res.ok) {
       const err = await res.text();
       throw new Error(err);
@@ -22,8 +22,10 @@ async function loadAllImages() {
       return;
     }
 
-    for (const filename of images) {
+    for (const image of images) {
+      const filename = typeof image === "string" ? image : image.filename; // handle both cases
       const imageUrl = `${API_URL}/images/${filename}`;
+
       const card = document.createElement("div");
       card.className = "image-card";
 
@@ -49,17 +51,10 @@ async function loadAllImages() {
   }
 }
 
-async function removeImage(filename) {
-  try {
-    const res = await fetch(`${API_URL}/DeleteImage/${filename}`, {
-      method: "DELETE",
-    });
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
-    console.log(`Deleted: ${filename}`);
-  } catch (err) {
-    console.error("Failed to delete image:", err);
+removeBtn.onclick = async () => {
+  const confirmed = confirm(`Remove image "${filename}"?`);
+  if (confirmed) {
+    await removeImage(filename); // ✅ Pass the actual string
+    loadAllImages(); // Refresh
   }
-}
+};
