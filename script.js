@@ -16,7 +16,7 @@ const img = document.getElementById("slideshow");
 async function showNextImage() {
   try {
     // Fetch a random image from the server
-    const response = await fetch("http://localhost:4000/GetNextImage");
+    const response = await fetch("http://51.12.220.246:4000/GetNextImage");
 
     if (response.ok) {
       const data = await response.json();
@@ -53,7 +53,7 @@ async function UploadImage(image) {
 
   try {
     // Send the POST request to the server
-    const response = await fetch("http://localhost:4000/SaveImage", {
+    const response = await fetch("http://51.12.220.246:4000/SaveImage", {
       method: "POST",
       body: formData,
     });
