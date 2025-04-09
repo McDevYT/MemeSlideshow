@@ -43,10 +43,5 @@ body {
 #img:focus {
   outline: none; /* Remove the default focus outline */
   border-color: #4e90ff; /* Blue border on focus */
-  background-color: rgba(
-    255,
-    255,
-    255,
-    0.3
-  ); /* Slightly brighter background on focus */
+  background-color: gray;
 }
