@@ -30,6 +30,7 @@ button:hover {
 }
 
 .image-card {
+  flex-wrap: wrap;
   background: white;
   border: 1px solid #ccc;
   padding: 10px;
