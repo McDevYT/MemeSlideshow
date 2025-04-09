@@ -36,7 +36,7 @@ async function loadAllImages() {
       removeBtn.onclick = async () => {
         const confirmed = confirm(`Remove image "${filename}"?`);
         if (confirmed) {
-          await removeImage(filename); // ✅ Pass the actual string
+          await removeImage(filename);
           loadAllImages(); // Refresh
         }
       };
@@ -47,5 +47,20 @@ async function loadAllImages() {
     }
   } catch (err) {
     console.error("Error loading images:", err);
+  }
+}
+async function removeImage(filename) {
+  try {
+    const res = await fetch(`${API_URL}/DeleteImage/${filename}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      const err = await res.text();
+
+      throw new Error(err);
+    }
+    console.log(`Deleted: ${filename}`);
+  } catch (err) {
+    console.error("Failed to delete image:", err);
   }
 }
