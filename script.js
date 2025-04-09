@@ -10,7 +10,7 @@ async function showNextImage() {
     if (response.ok) {
       const data = await response.json();
       const imageUrl = data.url;
-
+      console.log(imageUrl);
       // Preload the image and then show it
       const preloaded = new Image();
       preloaded.src = imageUrl;
@@ -32,8 +32,8 @@ async function showNextImage() {
 // Show the first image when the page loads
 showNextImage();
 
-// Change image every 7 seconds
-setInterval(showNextImage, 7000);
+// Change image every 10 seconds
+setInterval(showNextImage, 10000);
 
 // Upload image function
 async function UploadImage(image) {
