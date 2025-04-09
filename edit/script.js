@@ -50,6 +50,7 @@ async function loadAllImages() {
         }
       };
 
+      // Append buttons in correct order
       card.appendChild(img);
       card.appendChild(sendNextBtn); // Append Send Next button
       card.appendChild(removeBtn); // Append Remove button
