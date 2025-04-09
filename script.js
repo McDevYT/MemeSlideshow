@@ -1,22 +1,11 @@
-const images = [
-  "images/meme1.png",
-  "images/meme2.png",
-  "images/meme3.png",
-  "images/meme4.png",
-  "images/meme5.png",
-  "images/meme6.png",
-  "images/meme7.png",
-  "images/meme8.png",
-];
-
 let index = 0;
 const img = document.getElementById("slideshow");
 
 // Function to show the next image
 async function showNextImage() {
   try {
-    // Fetch a random image from the server
-    const response = await fetch("http://51.12.220.246:4000/GetNextImage");
+    // Fetch a random image from the server using HTTPS
+    const response = await fetch("https://51.12.220.246:4000/GetNextImage");
 
     if (response.ok) {
       const data = await response.json();
@@ -52,8 +41,8 @@ async function UploadImage(image) {
   formData.append("image", image); // Append the image file to the FormData
 
   try {
-    // Send the POST request to the server
-    const response = await fetch("http://51.12.220.246:4000/SaveImage", {
+    // Send the POST request to the server using HTTPS
+    const response = await fetch("https://51.12.220.246:4000/SaveImage", {
       method: "POST",
       body: formData,
     });
