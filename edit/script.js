@@ -32,29 +32,34 @@ async function loadAllImages() {
       const img = document.createElement("img");
       img.src = imageUrl;
 
+      // Create Send Next button
       const sendNextBtn = document.createElement("button");
-      removeBtn.textContent = "Send Next";
-      removeBtn.onclick = async () => {
+      sendNextBtn.textContent = "Send Next";
+      sendNextBtn.onclick = async () => {
         await sendNext(filename);
       };
+
+      // Create Remove button
       const removeBtn = document.createElement("button");
       removeBtn.textContent = "Remove";
       removeBtn.onclick = async () => {
         const confirmed = confirm(`Remove image "${filename}"?`);
         if (confirmed) {
           await removeImage(filename);
-          loadAllImages(); // Refresh
+          loadAllImages(); // Refresh the list
         }
       };
 
       card.appendChild(img);
-      card.appendChild(removeBtn);
+      card.appendChild(sendNextBtn); // Append Send Next button
+      card.appendChild(removeBtn); // Append Remove button
       container.appendChild(card);
     }
   } catch (err) {
     console.error("Error loading images:", err);
   }
 }
+
 async function removeImage(filename) {
   try {
     const res = await fetch(`${API_URL}/DeleteImage/${filename}`, {
