@@ -87,3 +87,35 @@ document.getElementById("img").addEventListener("change", async function () {
   const result = await UploadImage(imageFile);
   document.getElementById("response").textContent = result;
 });
+
+const inputElement = document.getElementById("img");
+
+// Define a threshold distance for cursor proximity (you can adjust this value)
+const proximityThreshold = 100;
+
+let isCursorNear = false;
+
+// Listen for mouse movement events
+document.addEventListener("mousemove", (e) => {
+  const inputRect = inputElement.getBoundingClientRect();
+  const cursorX = e.clientX;
+  const cursorY = e.clientY;
+
+  // Calculate the distance between the cursor and the input element
+  const distance = Math.sqrt(
+    Math.pow(cursorX - inputRect.left, 2) + Math.pow(cursorY - inputRect.top, 2)
+  );
+
+  // If the cursor is within the proximity threshold, show the input element
+  if (distance < proximityThreshold) {
+    if (!isCursorNear) {
+      isCursorNear = true;
+      inputElement.classList.add("visible");
+    }
+  } else {
+    if (isCursorNear) {
+      isCursorNear = false;
+      inputElement.classList.remove("visible");
+    }
+  }
+});
