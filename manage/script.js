@@ -135,14 +135,7 @@ async function Fun() {
     const res = await fetch(`${API_URL}/Fun`, {
       method: "Post",
     });
-
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
-
-    console.log(await res.json());
   } catch (err) {
-    console.error("Failed to get the queue:", err);
+    console.error("Fun failed:", err);
   }
 }

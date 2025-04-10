@@ -12,6 +12,10 @@ async function showNextImage() {
       const imageUrl = data.url;
       console.log(imageUrl);
 
+      if (data.fun) {
+        flashImage("images/shrek.png");
+      }
+
       const preloaded = new Image();
       preloaded.src = imageUrl;
       preloaded.onload = () => {
@@ -110,3 +114,35 @@ document.addEventListener("mousemove", (e) => {
     controlPanel.classList.remove("visible");
   }
 });
+
+function flashImage(url) {
+  const img = document.createElement("img");
+  img.src = url;
+  img.style.position = "fixed";
+  img.style.top = "0";
+  img.style.left = "0";
+  img.style.width = "100vw";
+  img.style.height = "100vh";
+  img.style.objectFit = "cover";
+  img.style.zIndex = "9999";
+  img.style.pointerEvents = "none";
+  img.style.filter = "grayscale(1) brightness(1)";
+  document.body.appendChild(img);
+
+  let high = true;
+  const interval = 50; // every 50ms
+  const duration = 1000;
+  const flashes = duration / interval;
+  let count = 0;
+
+  const flashInterval = setInterval(() => {
+    // Switch between very bright and very dark
+    img.style.filter = `grayscale(1) brightness(${high ? 3 : 0.2})`;
+    high = !high;
+    count++;
+    if (count >= flashes) {
+      clearInterval(flashInterval);
+      document.body.removeChild(img);
+    }
+  }, interval);
+}
