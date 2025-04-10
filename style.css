@@ -15,34 +15,72 @@ body {
   object-fit: contain;
   transition: opacity 1s ease-in-out;
   opacity: 1;
-  object-fit: contain;
-}
-
-#img {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  transition: all 0.3s ease;
-  border: 2px solid #fff; /* White border for contrast */
-  background-color: rgba(255, 255, 255, 0.1); /* Subtle background color */
-  border-radius: 5px; /* Rounded corners */
-  padding: 8px; /* Padding inside the input */
-  color: #fff; /* Text color */
-  font-size: 14px; /* Font size */
-  text-align: center; /* Center text */
 }
 
 #img.visible {
-  width: 200px; /* Adjust the width */
-  height: 40px; /* Adjust the height */
+  width: 200px;
+  height: 40px;
   opacity: 1;
   background-color: gray;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* Subtle glow effect */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 #img:focus {
-  outline: none; /* Remove the default focus outline */
-  border-color: #4e90ff; /* Blue border on focus */
+  outline: none;
+  border-color: #4e90ff;
   background-color: gray;
+}
+
+#controlPanel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+#controlPanel.visible {
+  width: 250px;
+  height: 120px;
+  opacity: 1;
+  background-color: rgba(50, 50, 50, 0.8);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+#img {
+  width: 100%;
+  opacity: 1;
+  background-color: gray;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  padding: 5px;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+}
+
+#pauseButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#pauseButton:hover {
+  background-color: #555;
 }

@@ -1,5 +1,7 @@
 let index = 0;
 const img = document.getElementById("slideshow");
+let slideshowInterval;
+let isPaused = false;
 
 async function showNextImage() {
   try {
@@ -9,7 +11,7 @@ async function showNextImage() {
       const data = await response.json();
       const imageUrl = data.url;
       console.log(imageUrl);
-      // Preload the image and then show it
+
       const preloaded = new Image();
       preloaded.src = imageUrl;
       preloaded.onload = () => {
@@ -27,9 +29,28 @@ async function showNextImage() {
   }
 }
 
-showNextImage();
+function startSlideshow() {
+  slideshowInterval = setInterval(showNextImage, 7000);
+}
 
-setInterval(showNextImage, 7000);
+function stopSlideshow() {
+  clearInterval(slideshowInterval);
+}
+
+document.getElementById("pauseButton").addEventListener("click", () => {
+  isPaused = !isPaused;
+  const button = document.getElementById("pauseButton");
+  if (isPaused) {
+    stopSlideshow();
+    button.textContent = "Resume";
+  } else {
+    startSlideshow();
+    button.textContent = "Pause";
+  }
+});
+
+showNextImage();
+startSlideshow();
 
 async function UploadImage(image) {
   const formData = new FormData();
@@ -41,7 +62,6 @@ async function UploadImage(image) {
       body: formData,
     });
 
-    // Handle the server response
     if (response.ok) {
       const data = await response.json();
       console.log("Image uploaded successfully:", data);
@@ -57,11 +77,8 @@ async function UploadImage(image) {
   }
 }
 
-// Handle the file input change
 document.getElementById("img").addEventListener("change", async function () {
-  const fileInput = document.getElementById("img");
-  const imageFile = fileInput.files[0];
-
+  const imageFile = this.files[0];
   if (!imageFile) {
     alert("Please select an image to upload.");
     return;
@@ -71,30 +88,25 @@ document.getElementById("img").addEventListener("change", async function () {
   alert(result);
 });
 
+// Show input when mouse is near center of screen
 const inputElement = document.getElementById("img");
-
-const proximityThreshold = 100;
-
-let isCursorNear = false;
+const popup = document.getElementById("popup");
+const controlPanel = document.getElementById("controlPanel");
+const centerThreshold = 150;
 
 document.addEventListener("mousemove", (e) => {
-  const inputRect = inputElement.getBoundingClientRect();
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
   const cursorX = e.clientX;
   const cursorY = e.clientY;
 
   const distance = Math.sqrt(
-    Math.pow(cursorX - inputRect.left, 2) + Math.pow(cursorY - inputRect.top, 2)
+    Math.pow(cursorX - centerX, 2) + Math.pow(cursorY - centerY, 2)
   );
 
-  if (distance < proximityThreshold) {
-    if (!isCursorNear) {
-      isCursorNear = true;
-      inputElement.classList.add("visible");
-    }
+  if (distance < centerThreshold) {
+    controlPanel.classList.add("visible");
   } else {
-    if (isCursorNear) {
-      isCursorNear = false;
-      inputElement.classList.remove("visible");
-    }
+    controlPanel.classList.remove("visible");
   }
 });
