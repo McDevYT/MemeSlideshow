@@ -3,6 +3,8 @@ const img = document.getElementById("slideshow");
 let slideshowInterval;
 let isPaused = false;
 
+let lastImageURL;
+
 async function showNextImage() {
   try {
     const response = await fetch("https://51.12.220.246:4000/GetNextImage");
@@ -11,16 +13,18 @@ async function showNextImage() {
       const data = await response.json();
       const imageUrl = data.url;
       console.log(imageUrl);
-
-      const preloaded = new Image();
-      preloaded.src = imageUrl;
-      preloaded.onload = () => {
-        img.style.opacity = 0;
-        setTimeout(() => {
-          img.src = preloaded.src;
-          img.style.opacity = 1;
-        }, 500);
-      };
+      if (imageUrl != lastImageURL) {
+        const preloaded = new Image();
+        preloaded.src = imageUrl;
+        preloaded.onload = () => {
+          img.style.opacity = 0;
+          setTimeout(() => {
+            img.src = preloaded.src;
+            img.style.opacity = 1;
+          }, 500);
+        };
+      }
+      lastImageURL = imageUrl;
     } else {
       console.error("Failed to get image from server:", await response.text());
     }
@@ -30,7 +34,7 @@ async function showNextImage() {
 }
 
 function startSlideshow() {
-  slideshowInterval = setInterval(showNextImage, 7000);
+  slideshowInterval = setInterval(showNextImage, 15000);
 }
 
 function stopSlideshow() {

@@ -1,19 +1,26 @@
 const API_URL = "https://51.12.220.246:4000";
 
-// Load all images when the button is clicked
-document.getElementById("loadImages").addEventListener("click", loadAllImages);
-document.getElementById("qlearQueue").addEventListener("click", loadRemoved);
+// Event listeners
+document
+  .getElementById("loadImages")
+  .addEventListener("click", () => loadAllImages(false));
+document
+  .getElementById("qlearQueue")
+  .addEventListener("click", () => clearQueue());
 
-async function loadAllImages() {
+document.getElementById("loadLoop").addEventListener("click", () => loadLoop());
+
+document
+  .getElementById("clearLoop")
+  .addEventListener("click", () => clearLoop());
+
+async function loadAllImages(removed = false) {
   const container = document.getElementById("imageList");
   container.innerHTML = ""; // Clear current content
 
   try {
-    const res = await fetch(`${API_URL}/GetAllImages`);
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
+    const res = await fetch(`${API_URL}/GetAllImages?removed=${removed}`);
+    if (!res.ok) throw new Error(await res.text());
 
     const images = await res.json();
 
@@ -22,7 +29,7 @@ async function loadAllImages() {
       return;
     }
 
-    for (const image of images) {
+    images.forEach((image) => {
       const filename = typeof image === "string" ? image : image.filename;
       const imageUrl = `${API_URL}/images/${filename}`;
 
@@ -32,33 +39,54 @@ async function loadAllImages() {
       const img = document.createElement("img");
       img.src = imageUrl;
 
-      // Create Send Next button
-      const sendNextBtn = document.createElement("button");
-      sendNextBtn.textContent = "Send Next";
-      sendNextBtn.onclick = async () => {
-        await sendNext(filename);
-      };
-
-      // Create Remove button
-      const removeBtn = document.createElement("button");
-      removeBtn.textContent = "Remove";
-      removeBtn.onclick = async () => {
-        const confirmed = confirm(`Remove image "${filename}"?`);
-        if (confirmed) {
-          await removeImage(filename);
-          loadAllImages(); // Refresh the list
-        }
-      };
-
-      // Append buttons in correct order
+      const buttons = createButtons(filename, removed);
       card.appendChild(img);
-      card.appendChild(sendNextBtn); // Append Send Next button
-      card.appendChild(removeBtn); // Append Remove button
+      card.appendChild(buttons);
       container.appendChild(card);
-    }
+    });
   } catch (err) {
     console.error("Error loading images:", err);
   }
+}
+
+function createButtons(filename, removed) {
+  const buttons = document.createElement("div");
+  buttons.className = "cardButtons";
+
+  // Send Next button
+  const sendNextBtn = createButton(
+    "Send Next",
+    async () => await sendNext(filename)
+  );
+
+  // Add to Loop button
+  const addLoopBtn = createButton("Add to Loop", async () => {
+    await addToLoopQueue(filename);
+    loadLoop(removed); // Refresh list after adding to loop
+  });
+
+  // Remove button
+  const removeBtn = createButton("Remove", async () => {
+    const confirmed = confirm(`Remove image "${filename}"?`);
+    if (confirmed) {
+      await removeImage(filename);
+      loadAllImages(removed); // Refresh list after removal
+    }
+  });
+
+  // Append buttons
+  buttons.appendChild(sendNextBtn);
+  buttons.appendChild(addLoopBtn);
+  buttons.appendChild(removeBtn);
+
+  return buttons;
+}
+
+function createButton(text, onClick) {
+  const button = document.createElement("button");
+  button.textContent = text;
+  button.onclick = onClick;
+  return button;
 }
 
 async function removeImage(filename) {
@@ -66,14 +94,82 @@ async function removeImage(filename) {
     const res = await fetch(`${API_URL}/RemoveImage/${filename}?remove=false`, {
       method: "DELETE",
     });
-    if (!res.ok) {
-      const err = await res.text();
-
-      throw new Error(err);
-    }
+    if (!res.ok) throw new Error(await res.text());
     console.log(`Deleted: ${filename}`);
   } catch (err) {
     console.error("Failed to delete image:", err);
+  }
+}
+
+async function addToLoopQueue(filename) {
+  try {
+    const res = await fetch(`${API_URL}/AddLoop`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ filename }),
+    });
+    console.log(`Added to loop: ${filename}`);
+  } catch (err) {
+    console.error("Failed to add image to loop:", err);
+  }
+}
+
+async function loadLoop() {
+  const container = document.getElementById("loopList");
+  container.innerHTML = ""; // Clear current content
+
+  try {
+    const res = await fetch(`${API_URL}/GetLoop`);
+    if (!res.ok) throw new Error(await res.text());
+
+    const images = await res.json();
+
+    if (images.length === 0) {
+      container.innerHTML = "<p>No images found.</p>";
+      return;
+    }
+
+    images.forEach((image) => {
+      const filename = typeof image === "string" ? image : image.filename;
+      const imageUrl = `${API_URL}/images/${filename}`;
+
+      const card = document.createElement("div");
+      card.className = "image-card";
+
+      const img = document.createElement("img");
+      img.src = imageUrl;
+      const removeBtn = createButton(
+        "Remove from Loop",
+        async () => await removeFromLoop(filename)
+      );
+
+      card.appendChild(img);
+      card.appendChild(removeBtn);
+      container.appendChild(card);
+    });
+  } catch (err) {
+    console.error("Error loading images:", err);
+  }
+}
+
+async function removeFromLoop(filename) {
+  try {
+    const res = await fetch(`${API_URL}/RemoveFromLoop`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filename }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    console.log(`Removed from loop queue: ${filename}`);
+  } catch (err) {
+    console.error("Failed to remove image from loop:", err);
   }
 }
 
@@ -87,31 +183,37 @@ async function sendNext(filename) {
       body: JSON.stringify({ filename }),
     });
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
-
+    if (!res.ok) throw new Error(await res.text());
     console.log(`Next image set: ${filename}`);
   } catch (err) {
     console.error("Failed to set next image:", err);
   }
 }
 
-async function loadRemoved() {
+async function clearQueue() {
   try {
     const res = await fetch(`${API_URL}/ClearSendNextQueue`, {
       method: "POST",
     });
-
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
+    if (!res.ok) throw new Error(await res.text());
 
     console.log(`Queue Cleared`);
   } catch (err) {
     console.error("Failed to clear the queue:", err);
+  }
+}
+
+async function clearLoop() {
+  try {
+    const res = await fetch(`${API_URL}/ClearLoop`, {
+      method: "POST",
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const container = document.getElementById("loopList");
+    container.innerHTML = "<p>No images found.</p>";
+    console.log(`Loop Cleared`);
+  } catch (err) {
+    console.error("Failed to clear the Loop:", err);
   }
 }
 
@@ -121,10 +223,7 @@ async function GetSendNextQueue() {
       method: "GET",
     });
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
+    if (!res.ok) throw new Error(await res.text());
 
     const queue = await res.json();
     console.log("Current Send Next Queue:", queue);
