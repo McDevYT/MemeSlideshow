@@ -2,7 +2,7 @@ const API_URL = "https://51.12.220.246:4000";
 
 // Load all images when the button is clicked
 document.getElementById("loadImages").addEventListener("click", loadAllImages);
-document.getElementById("qlearQueue").addEventListener("click", clearQueue);
+document.getElementById("qlearQueue").addEventListener("click", loadRemoved);
 
 async function loadAllImages() {
   const container = document.getElementById("imageList");
@@ -63,7 +63,7 @@ async function loadAllImages() {
 
 async function removeImage(filename) {
   try {
-    const res = await fetch(`${API_URL}/DeleteImage/${filename}`, {
+    const res = await fetch(`${API_URL}/RemoveImage/${filename}?remove=false`, {
       method: "DELETE",
     });
     if (!res.ok) {
@@ -98,7 +98,7 @@ async function sendNext(filename) {
   }
 }
 
-async function clearQueue() {
+async function loadRemoved() {
   try {
     const res = await fetch(`${API_URL}/ClearSendNextQueue`, {
       method: "POST",

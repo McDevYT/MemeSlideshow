@@ -1,15 +1,22 @@
 const API_URL = "https://51.12.220.246:4000";
 
-document.getElementById("loadImages").addEventListener("click", loadAllImages);
-document.getElementById("qlearQueue").addEventListener("click", clearQueue);
+document.getElementById("loadImages").addEventListener("click", () => {
+  loadAllImages(false);
+});
+document.getElementById("loadRemoved").addEventListener("click", loadRemoved);
 document.getElementById("funButton").addEventListener("click", Fun);
 
-async function loadAllImages() {
-  const container = document.getElementById("imageList");
+async function loadAllImages(removed) {
+  const container = removed
+    ? document.getElementById("removedList")
+    : document.getElementById("imageList");
   container.innerHTML = "";
 
   try {
-    const res = await fetch(`${API_URL}/GetAllImages`);
+    const res = await fetch(
+      `${API_URL}/GetAllImages?removed=${removed ? "true" : "false"}`
+    );
+
     if (!res.ok) {
       const err = await res.text();
       throw new Error(err);
@@ -24,7 +31,9 @@ async function loadAllImages() {
 
     for (const image of images) {
       const filename = typeof image === "string" ? image : image.filename;
-      const imageUrl = `${API_URL}/images/${filename}`;
+      const imageUrl = `${API_URL}/${
+        removed ? "removed_images" : "images"
+      }/${filename}`;
 
       const card = document.createElement("div");
       card.className = "image-card";
@@ -43,8 +52,8 @@ async function loadAllImages() {
       removeBtn.onclick = async () => {
         const confirmed = confirm(`Remove image "${filename}"?`);
         if (confirmed) {
-          await removeImage(filename);
-          loadAllImages();
+          await removeImage(filename, removed);
+          loadAllImages(removed);
         }
       };
 
@@ -58,14 +67,16 @@ async function loadAllImages() {
   }
 }
 
-async function removeImage(filename) {
+async function removeImage(filename, removed) {
   try {
-    const res = await fetch(`${API_URL}/DeleteImage/${filename}`, {
-      method: "DELETE",
-    });
+    const res = await fetch(
+      `${API_URL}/RemoveImage/${filename}?remove=true&fromRemoved=${removed}`,
+      {
+        method: "DELETE",
+      }
+    );
     if (!res.ok) {
       const err = await res.text();
-
       throw new Error(err);
     }
     console.log(`Deleted: ${filename}`);
@@ -95,21 +106,8 @@ async function sendNext(filename) {
   }
 }
 
-async function clearQueue() {
-  try {
-    const res = await fetch(`${API_URL}/ClearSendNextQueue`, {
-      method: "POST",
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
-
-    console.log(`Queue Cleared`);
-  } catch (err) {
-    console.error("Failed to clear the queue:", err);
-  }
+async function loadRemoved() {
+  await loadAllImages(true);
 }
 
 async function GetSendNextQueue() {
