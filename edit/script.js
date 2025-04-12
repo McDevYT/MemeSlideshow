@@ -94,7 +94,7 @@ function createButton(text, onClick) {
 async function removeImage(filename) {
   try {
     const res = await fetch(
-      `${API_URL}/RemoveImage/${filename}?fromRemoved=false`,
+      `${API_URL}/RemoveImage/${filename}?remove=false&fromRemoved=false`,
       {
         method: "DELETE",
       }
