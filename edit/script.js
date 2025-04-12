@@ -19,12 +19,10 @@ async function loadAllImages(removed = false) {
   container.innerHTML = ""; // Clear current content
 
   try {
-    const res = await fetch(`${API_URL}/GetAllImages`, {
+    const res = await fetch(`${API_URL}/GetAllImages?removed=${removed}`, {
       method: "GET",
-      body: {
-        removed: removed,
-      },
     });
+
     if (!res.ok) throw new Error(await res.text());
 
     const images = await res.json();
