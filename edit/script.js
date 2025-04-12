@@ -54,15 +54,14 @@ function createButtons(filename, removed) {
   buttons.className = "cardButtons";
 
   // Send Next button
-  const sendNextBtn = createButton(
-    "Send Next",
-    async () => await sendNext(filename)
-  );
+  const sendNextBtn = createButton("Send Next", async () => {
+    await sendNext(filename);
+  });
 
   // Add to Loop button
   const addLoopBtn = createButton("Add to Loop", async () => {
     await addToLoopQueue(filename);
-    loadLoop(removed); // Refresh list after adding to loop
+    await loadLoop(); // Refresh loop view
   });
 
   // Remove button
@@ -159,15 +158,13 @@ async function removeFromLoop(filename) {
     const res = await fetch(`${API_URL}/RemoveFromLoop`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename }),
+      body: JSON.stringify({ filename }), // Corrected: send body, not URL param
     });
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
+    if (!res.ok) throw new Error(await res.text());
 
     console.log(`Removed from loop queue: ${filename}`);
+    await loadLoop(); // Refresh UI after removing
   } catch (err) {
     console.error("Failed to remove image from loop:", err);
   }
